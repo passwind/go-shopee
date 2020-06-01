@@ -4,12 +4,13 @@ type ItemService interface {
 	List(interface{}) ([]Item, error)
 	ListWithPagination(sid uint64, offset, limit uint32, options interface{}) ([]Item, *Pagination, error)
 	Count(interface{}) (int, error)
-	Get(int64, interface{}) (*Item, error)
+	Get(uint64, uint64) (*ItemOper, error)
 	Create(newItem Item) (*ItemOper, error)
 	Update(Item) (*ItemOper, error)
 	UpdatePrice(sid, itemid uint64, price float64) (*ItemPriceOper, error)
 	UpdateStock(sid, itemid uint64, stock uint32) (*ItemStockOper, error)
-	Delete(int64) error
+	Delete(sid, itemid uint64) error
+	UnlistItem(sid, itemid uint64, unlist bool) ([]UnlistItemSuccess, []UnlistItemFailed, error)
 }
 
 type Item struct {
@@ -96,8 +97,16 @@ func (s *ItemServiceOp) ListWithPagination(sid uint64, offset, limit uint32, opt
 func (s *ItemServiceOp) Count(interface{}) (int, error) {
 	return 0, nil
 }
-func (s *ItemServiceOp) Get(int64, interface{}) (*Item, error) {
-	return nil, nil
+
+func (s *ItemServiceOp) Get(sid, itemid uint64) (*ItemOper, error) {
+	path := "/item/get"
+	wrappedData := map[string]interface{}{
+		"item_id": itemid,
+		"shopid":  sid,
+	}
+	resource := new(ItemOperResponse)
+	err := s.client.Post(path, wrappedData, resource)
+	return resource.Item, err
 }
 
 type ItemOper struct {
@@ -160,9 +169,22 @@ func (s *ItemServiceOp) Update(updItem Item) (*ItemOper, error) {
 	return resource.Item, err
 }
 
+type ItemDeleteResponse struct {
+	ItemID    uint64 `json:"item_id"`
+	Msg       string `json:"msg"`
+	RequestID string `json:"request_id"`
+}
+
 // Delete https://open.shopee.com/documents?module=2&type=1&id=369
-func (s *ItemServiceOp) Delete(int64) error {
-	return nil
+func (s *ItemServiceOp) Delete(sid, itemid uint64) error {
+	path := "/item/delete"
+	wrappedData := map[string]interface{}{
+		"item_id": itemid,
+		"shopid":  sid,
+	}
+	resource := new(ItemDeleteResponse)
+	err := s.client.Post(path, wrappedData, resource)
+	return err
 }
 
 type ItemPriceOper struct {
@@ -212,4 +234,35 @@ func (s *ItemServiceOp) UpdateStock(sid, itemid uint64, stock uint32) (*ItemStoc
 	resource := new(ItemStockOperResponse)
 	err := s.client.Post(path, wrappedData, resource)
 	return resource.Item, err
+}
+
+type UnlistItemFailed struct {
+	ItemID           uint32 `json:"item_id"`
+	ErrorDescription string `json:"error_description"`
+}
+
+type UnlistItemSuccess struct {
+	ItemID uint32 `json:"item_id"`
+	Unlist bool   `json:"unlist"`
+}
+
+type UnlistResponse struct {
+	Failed    []UnlistItemFailed  `json:"failed"`
+	Success   []UnlistItemSuccess `json:"success"`
+	RequestID string              `json:"request_id"`
+}
+
+// UnlistItem https://open.shopee.com/documents?module=2&type=1&id=431
+func (s *ItemServiceOp) UnlistItem(sid, itemid uint64, unlist bool) ([]UnlistItemSuccess, []UnlistItemFailed, error) {
+	path := "/items/unlist"
+	wrappedData := map[string]interface{}{
+		"items": map[string]interface{}{
+			"item_id": itemid,
+			"unlist":  unlist,
+		},
+		"shopid": sid,
+	}
+	resource := new(UnlistResponse)
+	err := s.client.Post(path, wrappedData, resource)
+	return resource.Success, resource.Failed, err
 }

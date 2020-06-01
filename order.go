@@ -9,7 +9,7 @@ type OrderService interface {
 	List(interface{}) ([]Order, error)
 	ListWithPagination(sid uint64, offset, limit uint32, options interface{}) ([]Order, *Pagination, error)
 	Count(interface{}) (int, error)
-	Get(string, interface{}) (*Order, error)
+	Get(sid uint64, ordersn string, options interface{}) (*Order, error)
 	Create(Order) (*Order, error)
 	Update(Order) (*Order, error)
 	Cancel(sid uint64, ordersn, reason string, itemid uint64) error

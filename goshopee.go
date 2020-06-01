@@ -6,6 +6,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -430,4 +431,18 @@ func (c *Client) Put(path string, data, resource interface{}) error {
 // Delete performs a DELETE request for the given path
 func (c *Client) Delete(path string) error {
 	return c.CreateAndDo("DELETE", path, nil, nil, nil)
+}
+
+func (c *Client) Token() string {
+	baseStr := c.app.PartnerKey + c.app.RedirectURL
+	h := sha256.New()
+	h.Write([]byte(baseStr))
+	result := hex.EncodeToString(h.Sum(nil))
+	return result
+}
+
+func (c *Client) AuthURL() string {
+	token := c.Token()
+	aurl := fmt.Sprintf("%s?id=%d&token=%s&redirect=%s", c.app.AuthURL, c.app.PartnerID, token, c.app.RedirectURL)
+	return aurl
 }

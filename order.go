@@ -1,14 +1,18 @@
 package goshopee
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 type OrderService interface {
 	List(interface{}) ([]Order, error)
 	ListWithPagination(sid uint64, offset, limit uint32, options interface{}) ([]Order, *Pagination, error)
 	Count(interface{}) (int, error)
-	Get(int64, interface{}) (*Order, error)
+	Get(string, interface{}) (*Order, error)
 	Create(Order) (*Order, error)
 	Update(Order) (*Order, error)
+	Cancel(sid uint64, ordersn, reason string, itemid uint64) error
 	Delete(int64) error
 }
 
@@ -90,6 +94,12 @@ type OrdersResponse struct {
 	RequestID string  `json:"request_id"`
 }
 
+// OrdersDetailResponse https://open.shopee.com/documents?module=4&type=1&id=397
+type OrdersDetailResponse struct {
+	Orders    []Order `json:"orders"`
+	RequestID string  `json:"request_id"`
+}
+
 // Pagination of results
 // type Pagination struct {
 // 	Offset   uint32 `json:"offset"`
@@ -131,8 +141,18 @@ func (s *OrderServiceOp) ListWithPagination(sid uint64, offset, limit uint32, op
 func (s *OrderServiceOp) Count(interface{}) (int, error) {
 	return 0, nil
 }
-func (s *OrderServiceOp) Get(int64, interface{}) (*Order, error) {
-	return nil, nil
+func (s *OrderServiceOp) Get(sid uint64, ordersn string, options interface{}) (*Order, error) {
+	path := "/orders/detail"
+	wrappedData := map[string]interface{}{
+		"ordersn_list": []string{ordersn},
+		"shopid":       sid,
+	}
+	resource := new(OrdersDetailResponse)
+	err := s.client.Post(path, wrappedData, resource)
+	if len(resource.Orders) == 0 {
+		return nil, fmt.Errorf("no such order: [%s]", ordersn)
+	}
+	return &resource.Orders[0], err
 }
 
 // Create https://open.shopee.com/documents?module=2&type=1&id=365
@@ -145,7 +165,25 @@ func (s *OrderServiceOp) Update(Order) (*Order, error) {
 	return nil, nil
 }
 
-// Delete https://open.shopee.com/documents?module=2&type=1&id=369
+type OrderCancelResponse struct {
+	ModifiedTime uint32 `json:"modified_time"`
+	RequestID    string `json:"request_id"`
+}
+
+// Cancel https://open.shopee.com/documents?module=4&type=1&id=395
+func (s *OrderServiceOp) Cancel(sid uint64, ordersn, reason string, itemid uint64) error {
+	path := "/orders/cancel"
+	wrappedData := map[string]interface{}{
+		"ordersn":       ordersn,
+		"cancel_reason": reason,
+		"item_id":       itemid,
+		"shopid":        sid,
+	}
+	resource := new(OrderCancelResponse)
+	err := s.client.Post(path, wrappedData, resource)
+	return err
+}
+
 func (s *OrderServiceOp) Delete(int64) error {
 	return nil
 }

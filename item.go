@@ -110,6 +110,7 @@ func (s *ItemServiceOp) Get(sid, itemid uint64) (*ItemOper, error) {
 }
 
 type ItemOper struct {
+	ID            uint64           `json:"item_id"`
 	ShopID        uint64           `json:"shop_id"`
 	ItemSKU       string           `json:"item_sku"`
 	Status        string           `json:"status"`
@@ -132,9 +133,9 @@ type ItemOper struct {
 	Sales         uint32           `json:"sales"`
 	Views         uint32           `json:"views"`
 	Likes         uint32           `json:"likes"`
-	PackageLength uint32           `json:"package_length"`
+	PackageLength float64          `json:"package_length"`
 	PackageWidth  float64          `json:"package_width"`
-	PackageHight  uint32           `json:"package_height"`
+	PackageHight  float64          `json:"package_height"`
 	DaysToShip    uint32           `json:"days_to_ship"`
 	RatingStar    float64          `json:"rating_star"`
 	CmtCount      uint32           `json:"cmt_count"`

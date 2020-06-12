@@ -133,7 +133,7 @@ type ItemOper struct {
 	Views         uint32           `json:"views"`
 	Likes         uint32           `json:"likes"`
 	PackageLength uint32           `json:"package_length"`
-	PackageWidth  uint32           `json:"package_width"`
+	PackageWidth  float64          `json:"package_width"`
 	PackageHight  uint32           `json:"package_height"`
 	DaysToShip    uint32           `json:"days_to_ship"`
 	RatingStar    float64          `json:"rating_star"`

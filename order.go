@@ -6,7 +6,7 @@ import (
 )
 
 type OrderService interface {
-	List(interface{}) ([]Order, error)
+	List(uint64) ([]Order, error)
 	ListWithPagination(sid uint64, offset, limit uint32, options interface{}) ([]Order, *Pagination, error)
 	Count(interface{}) (int, error)
 	Get(sid uint64, ordersn string, options interface{}) (*Order, error)
@@ -24,8 +24,8 @@ type Order struct {
 	Status                       string            `json:"order_status"`
 	Currency                     string            `json:"currency"`
 	TrackingNo                   string            `json:"tracking_no"`
-	EscrowAmount                 float64           `json:"escrow_amount"`
-	TotalAmount                  float64           `json:"total_amount"`
+	EscrowAmount                 string            `json:"escrow_amount"`
+	TotalAmount                  string            `json:"total_amount"`
 	Country                      string            `json:"country"`
 	ServiceCode                  string            `json:"service_code"`
 	EstimatedShippingFee         string            `json:"estimated_shipping_fee"`
@@ -33,25 +33,25 @@ type Order struct {
 	ShippingCarrier              string            `json:"shipping_carrier"`
 	COD                          bool              `json:"cod"`                  // This value indicates whether the order was a COD (cash on delivery) order.
 	DaysToShip                   uint32            `json:"days_to_ship"`         // Shipping preparation time set by the seller when listing item on Shopee.
-	ActualShippingCost           float64           `json:"actual_shipping_cost"` // The actual shipping cost of the order if available from external logistics partners.
+	ActualShippingCost           string            `json:"actual_shipping_cost"` // The actual shipping cost of the order if available from external logistics partners.
 	GoodsToDeclare               bool              `json:"goods_to_declare"`
 	MessageToSeller              string            `json:"message_to_seller"`
 	Note                         string            `json:"note"`
-	NoteUpdateTime               time.Time         `json:"note_update_time"`
-	CreateTime                   time.Time         `json:"create_time"`
-	UpdateTime                   time.Time         `json:"update_time"`
+	NoteUpdateTime               int64             `json:"note_update_time"`
+	CreateTime                   int64             `json:"create_time"`
+	UpdateTime                   int64             `json:"update_time"`
 	Items                        []OrderItem       `json:"items"`
-	PayTime                      *uint32           `json:"pay_time"` // The time when the order status is updated from UNPAID to PAID. This value is NULL when order is not paid yet.
+	PayTime                      *int64            `json:"pay_time"` // The time when the order status is updated from UNPAID to PAID. This value is NULL when order is not paid yet.
 	DropShipper                  string            `json:"dropshipper"`
 	CreditCardNumber             string            `json:"credit_card_number"`
 	DropShipperPhone             string            `json:"dropshipper_phone"`
-	ShipByDate                   uint32            `json:"ship_by_date"`
+	ShipByDate                   int64             `json:"ship_by_date"`
 	IsSplitUp                    bool              `json:"is_split_up"`
 	BuyerCancelReason            string            `json:"buyer_cancel_reason"`
 	CancelBy                     string            `json:"cancel_by"`
 	FmTN                         string            `json:"fm_tn"` // The first-mile tracking number.
 	CancelReason                 string            `json:"cancel_reason"`
-	EscrowTax                    float64           `json:"escrow_tax"`
+	EscrowTax                    string            `json:"escrow_tax"`
 	IsActualShippingFeeConfirmed bool              `json:"is_actual_shipping_fee_confirmed"`
 }
 
@@ -115,9 +115,18 @@ type OrderServiceOp struct {
 }
 
 // List xxx
-func (s *OrderServiceOp) List(options interface{}) ([]Order, error) {
-	// TODO:
-	return nil, nil
+func (s *OrderServiceOp) List(sid uint64) ([]Order, error) {
+	timeTo := time.Now().Unix()
+	timeFrom := timeTo - 3600*24*15
+	path := "/orders/basics"
+	wrappedData := map[string]interface{}{
+		"create_time_from": timeFrom,
+		"create_time_to":   timeTo,
+		"shopid":           sid,
+	}
+	resource := new(OrdersResponse)
+	err := s.client.Post(path, wrappedData, resource)
+	return resource.Orders, err
 }
 
 // ListWithPagination https://open.shopee.com/documents?module=4&type=1&id=399

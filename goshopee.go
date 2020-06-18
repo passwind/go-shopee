@@ -67,9 +67,11 @@ type Client struct {
 	RateLimits RateLimitInfo
 
 	// Services used for communicating with the API
-	Item      ItemService
-	Variation VariationService
-	Order     OrderService
+	Item          ItemService
+	Variation     VariationService
+	ItemCategory  ItemCategoryService
+	ItemAttribute ItemAttributeService
+	Order         OrderService
 }
 
 // A general response error that follows a similar layout to Shopify's response
@@ -219,6 +221,8 @@ func NewClient(app App, opts ...Option) *Client {
 	c.Item = &ItemServiceOp{client: c}
 	c.Order = &OrderServiceOp{client: c}
 	c.Variation = &VariationServiceOp{client: c}
+	c.ItemCategory = &ItemCategoryServiceOp{client: c}
+	c.ItemAttribute = &ItemAttributeServiceOp{client: c}
 
 	return c
 }

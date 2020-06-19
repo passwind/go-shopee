@@ -7,9 +7,10 @@ import (
 
 type OrderService interface {
 	List(uint64) ([]Order, error)
-	ListWithPagination(sid uint64, offset, limit uint32, options interface{}) ([]Order, *Pagination, error)
+	ListWithPagination(sid uint64, offset, limit uint32, options map[string]interface{}) ([]Order, *Pagination, error)
 	Count(interface{}) (int, error)
-	Get(sid uint64, ordersn string, options interface{}) (*Order, error)
+	Get(sid uint64, ordersn string) (*Order, error)
+	GetMulti(sid uint64, orders []string) ([]Order, []string, error)
 	Create(Order) (*Order, error)
 	Update(Order) (*Order, error)
 	Cancel(sid uint64, ordersn, reason string, itemid uint64) error
@@ -96,8 +97,9 @@ type OrdersResponse struct {
 
 // OrdersDetailResponse https://open.shopee.com/documents?module=4&type=1&id=397
 type OrdersDetailResponse struct {
-	Orders    []Order `json:"orders"`
-	RequestID string  `json:"request_id"`
+	Orders    []Order  `json:"orders"`
+	Errors    []string `json:"errors"`
+	RequestID string   `json:"request_id"`
 }
 
 // Pagination of results
@@ -123,6 +125,7 @@ func (s *OrderServiceOp) List(sid uint64) ([]Order, error) {
 		"create_time_from": timeFrom,
 		"create_time_to":   timeTo,
 		"shopid":           sid,
+		// "pagination_entries_per_page": 1,
 	}
 	resource := new(OrdersResponse)
 	err := s.client.Post(path, wrappedData, resource)
@@ -130,13 +133,31 @@ func (s *OrderServiceOp) List(sid uint64) ([]Order, error) {
 }
 
 // ListWithPagination https://open.shopee.com/documents?module=4&type=1&id=399
-func (s *OrderServiceOp) ListWithPagination(sid uint64, offset, limit uint32, options interface{}) ([]Order, *Pagination, error) {
+func (s *OrderServiceOp) ListWithPagination(sid uint64, offset, limit uint32, options map[string]interface{}) ([]Order, *Pagination, error) {
 	path := "/orders/basics"
-	wrappedData := map[string]interface{}{
-		"pagination_offset":           offset,
-		"pagination_entries_per_page": limit,
-		"shopid":                      sid,
+	timeTo := time.Now().Unix()
+	timeFrom := timeTo - 3600*24*15
+
+	if options != nil {
+		if v, ok := options["create_time_from"]; ok {
+			timeFrom = v.(int64)
+		}
+		if v, ok := options["create_time_to"]; ok {
+			timeTo = v.(int64)
+		}
 	}
+
+	wrappedData := map[string]interface{}{
+		"pagination_offset": offset,
+		"shopid":            sid,
+		"create_time_from":  timeFrom,
+		"create_time_to":    timeTo,
+	}
+
+	if limit > 0 {
+		wrappedData["pagination_entries_per_page"] = limit
+	}
+
 	resource := new(OrdersResponse)
 	err := s.client.Post(path, wrappedData, resource)
 	page := &Pagination{
@@ -150,7 +171,7 @@ func (s *OrderServiceOp) ListWithPagination(sid uint64, offset, limit uint32, op
 func (s *OrderServiceOp) Count(interface{}) (int, error) {
 	return 0, nil
 }
-func (s *OrderServiceOp) Get(sid uint64, ordersn string, options interface{}) (*Order, error) {
+func (s *OrderServiceOp) Get(sid uint64, ordersn string) (*Order, error) {
 	path := "/orders/detail"
 	wrappedData := map[string]interface{}{
 		"ordersn_list": []string{ordersn},
@@ -159,9 +180,23 @@ func (s *OrderServiceOp) Get(sid uint64, ordersn string, options interface{}) (*
 	resource := new(OrdersDetailResponse)
 	err := s.client.Post(path, wrappedData, resource)
 	if len(resource.Orders) == 0 {
-		return nil, fmt.Errorf("no such order: [%s]", ordersn)
+		return nil, fmt.Errorf("no such order: [%s] %s", ordersn, err)
 	}
 	return &resource.Orders[0], err
+}
+
+func (s *OrderServiceOp) GetMulti(sid uint64, orders []string) ([]Order, []string, error) {
+	path := "/orders/detail"
+	wrappedData := map[string]interface{}{
+		"ordersn_list": orders,
+		"shopid":       sid,
+	}
+	resource := new(OrdersDetailResponse)
+	err := s.client.Post(path, wrappedData, resource)
+	if len(resource.Orders) == 0 {
+		return nil, resource.Errors, fmt.Errorf("no such order: [%v] %s", orders, err)
+	}
+	return resource.Orders, resource.Errors, err
 }
 
 // Create https://open.shopee.com/documents?module=2&type=1&id=365

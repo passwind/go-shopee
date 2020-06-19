@@ -224,6 +224,11 @@ func NewClient(app App, opts ...Option) *Client {
 	c.ItemCategory = &ItemCategoryServiceOp{client: c}
 	c.ItemAttribute = &ItemAttributeServiceOp{client: c}
 
+	// apply any options
+	for _, opt := range opts {
+		opt(c)
+	}
+
 	return c
 }
 

@@ -11,7 +11,7 @@ type Logistic struct {
 }
 
 type LogisticService interface {
-	Init(uint64, string) error
+	Init(uint64, string, string) error
 }
 
 // LogisticServiceOp handles communication with the logistics related methods of

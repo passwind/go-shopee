@@ -13,7 +13,7 @@ type OrderService interface {
 	GetMulti(sid uint64, orders []string) ([]Order, []string, error)
 	Create(Order) (*Order, error)
 	Update(Order) (*Order, error)
-	Cancel(sid uint64, ordersn, reason string, itemid uint64) error
+	Cancel(sid uint64, ordersn, reason string, options map[string]interface{}) error
 	Delete(int64) error
 }
 
@@ -215,14 +215,19 @@ type OrderCancelResponse struct {
 }
 
 // Cancel https://open.shopee.com/documents?module=4&type=1&id=395
-func (s *OrderServiceOp) Cancel(sid uint64, ordersn, reason string, itemid uint64) error {
+func (s *OrderServiceOp) Cancel(sid uint64, ordersn, reason string, options map[string]interface{}) error {
 	path := "/orders/cancel"
 	wrappedData := map[string]interface{}{
 		"ordersn":       ordersn,
 		"cancel_reason": reason,
-		"item_id":       itemid,
 		"shopid":        sid,
 	}
+	if options != nil {
+		for k, v := range options {
+			wrappedData[k] = v
+		}
+	}
+
 	resource := new(OrderCancelResponse)
 	err := s.client.Post(path, wrappedData, resource)
 	return err

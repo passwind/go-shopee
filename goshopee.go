@@ -1,3 +1,4 @@
+// Package goshopee provides methods for making requests to Shopee's Open API.
 package goshopee
 
 import (

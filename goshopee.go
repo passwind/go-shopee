@@ -68,6 +68,7 @@ type Client struct {
 	RateLimits RateLimitInfo
 
 	// Services used for communicating with the API
+	Shop          ShopService
 	Item          ItemService
 	Variation     VariationService
 	ItemCategory  ItemCategoryService
@@ -226,6 +227,7 @@ func NewClient(app App, opts ...Option) *Client {
 	c.ItemCategory = &ItemCategoryServiceOp{client: c}
 	c.ItemAttribute = &ItemAttributeServiceOp{client: c}
 	c.Logistic = &LogisticServiceOp{client: c}
+	c.Shop = &ShopServiceOp{client: c}
 
 	// apply any options
 	for _, opt := range opts {

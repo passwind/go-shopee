@@ -14,6 +14,7 @@ type LogisticService interface {
 	Init(uint64, string, map[string]interface{}) error
 	GetParameterForInit(sid uint64, ordersn string) (*GetParameterForInitResponse, error)
 	GetLogisticInfo(sid uint64, ordersn string) (*GetLogisticInfoResponse, error)
+	List(uint64) ([]Logistic, error)
 }
 
 // LogisticServiceOp handles communication with the logistics related methods of
@@ -25,6 +26,22 @@ type LogisticServiceOp struct {
 type LogisticInitResponse struct {
 	TrackingNumber string `json:"tracking_number"`
 	RequestID      string `json:"request_id"`
+}
+
+type ListReponse struct {
+	Logistics []Logistic `json:"logistics"`
+	RequestID string     `json:"request_id"`
+}
+
+// List https://open.shopee.com/documents?module=3&type=1&id=384
+func (s *LogisticServiceOp) List(sid uint64) ([]Logistic, error) {
+	path := "/logistics/channel/get"
+	wrappedData := map[string]interface{}{
+		"shopid": sid,
+	}
+	resource := new(ListReponse)
+	err := s.client.Post(path, wrappedData, resource)
+	return resource.Logistics, err
 }
 
 // Init https://open.shopee.com/documents?module=3&type=1&id=389

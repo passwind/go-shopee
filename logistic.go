@@ -11,7 +11,9 @@ type Logistic struct {
 }
 
 type LogisticService interface {
-	Init(uint64, string, string) error
+	Init(uint64, string, map[string]interface{}) error
+	GetParameterForInit(sid uint64, ordersn string) (*GetParameterForInitResponse, error)
+	GetLogisticInfo(sid uint64, ordersn string) (*GetLogisticInfoResponse, error)
 }
 
 // LogisticServiceOp handles communication with the logistics related methods of
@@ -26,16 +28,68 @@ type LogisticInitResponse struct {
 }
 
 // Init https://open.shopee.com/documents?module=3&type=1&id=389
-func (s *LogisticServiceOp) Init(sid uint64, ordersn, trackingNo string) error {
+func (s *LogisticServiceOp) Init(sid uint64, ordersn string, params map[string]interface{}) error {
 	path := "/logistics/init"
 	wrappedData := map[string]interface{}{
 		"ordersn": ordersn,
 		"shopid":  sid,
-		"non_integrated": map[string]interface{}{
-			"tracking_no": trackingNo,
-		},
+	}
+	for k, v := range params {
+		wrappedData[k] = v
 	}
 	resource := new(LogisticInitResponse)
 	err := s.client.Post(path, wrappedData, resource)
 	return err
+}
+
+type GetParameterForInitResponse struct {
+	Pickup        []string `json:"pickup"`
+	Dropoff       []string `json:"dropoff"`
+	NonIntegrated []string `json:"non_integrated"`
+	RequestID     string   `json:"request_id"`
+}
+
+// GetParameterForInit https://open.shopee.com/documents?module=3&type=1&id=386
+func (s *LogisticServiceOp) GetParameterForInit(sid uint64, ordersn string) (*GetParameterForInitResponse, error) {
+	path := "/logistics/init_parameter/get"
+	wrappedData := map[string]interface{}{
+		"ordersn": ordersn,
+		"shopid":  sid,
+	}
+	resource := new(GetParameterForInitResponse)
+	err := s.client.Post(path, wrappedData, resource)
+	return resource, err
+}
+
+type GetLogisticInfoResponsePickup struct {
+	AddressList []Address `json:"address_list"`
+}
+
+type GetLogisticInfoResponseDropoff struct {
+	BranchList []Branch `json:"branch_list"`
+}
+
+type GetLogisticInfoResponseInfoNeeded struct {
+	Pickup        []string `json:"pickup"`
+	Dropoff       []string `json:"dropoff"`
+	NonIntegrated []string `json:"non_integrated"`
+}
+
+type GetLogisticInfoResponse struct {
+	Pickup     GetLogisticInfoResponsePickup     `json:"pickup"`
+	Dropoff    GetLogisticInfoResponseDropoff    `json:"dropoff"`
+	InfoNeeded GetLogisticInfoResponseInfoNeeded `json:"info_needed"`
+	RequestID  string                            `json:"request_id"`
+}
+
+// GetLogisticInfo https://open.shopee.com/documents?module=3&type=1&id=417
+func (s *LogisticServiceOp) GetLogisticInfo(sid uint64, ordersn string) (*GetLogisticInfoResponse, error) {
+	path := "/logistics/init_info/get"
+	wrappedData := map[string]interface{}{
+		"ordersn": ordersn,
+		"shopid":  sid,
+	}
+	resource := new(GetLogisticInfoResponse)
+	err := s.client.Post(path, wrappedData, resource)
+	return resource, err
 }

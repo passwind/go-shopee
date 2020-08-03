@@ -3,9 +3,9 @@ package goshopee
 // TierVariation 2-tier variation
 // https://open.shopee.com/documents?module=2&type=1&id=422
 type TierVariation struct {
-	Name      string   `json:"name"`
-	Options   []string `json:"options"`
-	ImagesURL []string `json:"images_url"`
+	Name    string   `json:"name"`
+	Options []string `json:"options"`
+	// ImagesURL []string `json:"images_url"`
 }
 
 type TierVariationOperDef struct {

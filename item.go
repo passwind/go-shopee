@@ -11,8 +11,8 @@ type ItemService interface {
 	UpdateStock(sid, itemid uint64, stock uint32) (*ItemStockOper, error)
 	Delete(sid, itemid uint64) error
 	UnlistItem(sid, itemid uint64, unlist bool) ([]UnlistItemSuccess, []UnlistItemFailed, error)
-	InitTierVariation(sid, itemid uint64, tierVariations []TierVariation, variations []Variation) ([]Variation, error)
-	AddTierVariation(sid, itemid uint64, variations []Variation) ([]Variation, error)
+	InitTierVariation(sid, itemid uint64, tierVariations []TierVariation, variations []TierVariationOperDef) ([]Variation, error)
+	AddTierVariation(sid, itemid uint64, variations []TierVariationOperDef) ([]Variation, error)
 	GetVariations(sid, itemid uint64) ([]TierVariation, []Variation, error)
 	UpdateTierVariationList(sid, itemid uint64, tierVariations []TierVariation) error
 	UpdateTierVariationIndex(sid, itemid uint64, variations []Variation) error

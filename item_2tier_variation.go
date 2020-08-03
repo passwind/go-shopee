@@ -8,6 +8,13 @@ type TierVariation struct {
 	ImagesURL []string `json:"images_url"`
 }
 
+type TierVariationOperDef struct {
+	Stock        uint32   `json:"stock"`
+	Price        float64  `json:"price"`
+	VariationSKU string   `json:"variation_sku"`
+	TierIndex    []uint32 `json:"tier_index"`
+}
+
 type TierVariationOperResponse struct {
 	RequestID       string          `json:"request_id"`
 	ItemID          uint32          `json:"item_id"`
@@ -15,7 +22,7 @@ type TierVariationOperResponse struct {
 	VariationIDList []Variation     `json:"variation_id_list"`
 }
 
-func (s *ItemServiceOp) InitTierVariation(sid, itemid uint64, tierVariations []TierVariation, variations []Variation) ([]Variation, error) {
+func (s *ItemServiceOp) InitTierVariation(sid, itemid uint64, tierVariations []TierVariation, variations []TierVariationOperDef) ([]Variation, error) {
 	path := "/item/tier_var/init"
 	wrappedData := map[string]interface{}{
 		"item_id":        itemid,
@@ -28,7 +35,7 @@ func (s *ItemServiceOp) InitTierVariation(sid, itemid uint64, tierVariations []T
 	return resource.VariationIDList, err
 }
 
-func (s *ItemServiceOp) AddTierVariation(sid, itemid uint64, variations []Variation) ([]Variation, error) {
+func (s *ItemServiceOp) AddTierVariation(sid, itemid uint64, variations []TierVariationOperDef) ([]Variation, error) {
 	path := "/item/tier_var/add"
 	wrappedData := map[string]interface{}{
 		"item_id":   itemid,

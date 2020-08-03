@@ -4,13 +4,18 @@ type ItemService interface {
 	List(interface{}) ([]Item, error)
 	ListWithPagination(sid uint64, offset, limit uint32, options interface{}) ([]Item, *Pagination, error)
 	Count(interface{}) (int, error)
-	Get(uint64, uint64) (*ItemOper, error)
+	Get(uint64, uint64) (*Item, error)
 	Create(newItem Item) (*ItemOper, error)
 	Update(Item) (*ItemOper, error)
 	UpdatePrice(sid, itemid uint64, price float64) (*ItemPriceOper, error)
 	UpdateStock(sid, itemid uint64, stock uint32) (*ItemStockOper, error)
 	Delete(sid, itemid uint64) error
 	UnlistItem(sid, itemid uint64, unlist bool) ([]UnlistItemSuccess, []UnlistItemFailed, error)
+	InitTierVariation(sid, itemid uint64, tierVariations []TierVariation, variations []Variation) ([]Variation, error)
+	AddTierVariation(sid, itemid uint64, variations []Variation) ([]Variation, error)
+	GetVariations(sid, itemid uint64) ([]TierVariation, []Variation, error)
+	UpdateTierVariationList(sid, itemid uint64, tierVariations []TierVariation) error
+	UpdateTierVariationIndex(sid, itemid uint64, variations []Variation) error
 }
 
 type Item struct {
@@ -45,6 +50,11 @@ type Wholesale struct {
 	Min       uint32  `json:"min"`
 	Max       uint32  `json:"max"`
 	UnitPrice float64 `json:"unit_price"`
+}
+
+type ItemResponse struct {
+	ItemID    uint32 `json:"item_id"`
+	RequestID string `json:"request_id"`
 }
 
 // ItemsResponse Represents the result from the GetItemsList endpoint
@@ -98,13 +108,19 @@ func (s *ItemServiceOp) Count(interface{}) (int, error) {
 	return 0, nil
 }
 
-func (s *ItemServiceOp) Get(sid, itemid uint64) (*ItemOper, error) {
+type ItemDetailResponse struct {
+	ItemID  uint64 `json:"item_id"`
+	Item    *Item  `json:"item"`
+	Warning string `json:"warning"`
+}
+
+func (s *ItemServiceOp) Get(sid, itemid uint64) (*Item, error) {
 	path := "/item/get"
 	wrappedData := map[string]interface{}{
 		"item_id": itemid,
 		"shopid":  sid,
 	}
-	resource := new(ItemOperResponse)
+	resource := new(ItemDetailResponse)
 	err := s.client.Post(path, wrappedData, resource)
 	return resource.Item, err
 }

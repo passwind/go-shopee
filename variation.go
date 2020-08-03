@@ -1,20 +1,21 @@
 package goshopee
 
 type Variation struct {
-	ID                    uint64  `json:"variation_id"`
-	Name                  string  `json:"name"`
-	Stock                 uint32  `json:"stock"`
-	Price                 float64 `json:"price"`
-	VariationSKU          string  `json:"variation_sku"`
-	Status                string  `json:"status"`
-	CreateTime            uint32  `json:"create_time"`
-	UpdateTime            uint32  `json:"update_time"`
-	OriginalPrice         float64 `json:"original_price"`
-	InflatedOriginalPrice float64 `json:"inflated_original_price"`
-	InflatedPrice         float64 `json:"inflated_price"`
-	DiscountID            uint32  `json:"discount_id"`
-	ModifiedTime          uint32  `json:"modified_time"`
-	ItemID                uint64  `json:"item_id"`
+	ID                    uint64   `json:"variation_id"`
+	Name                  string   `json:"name"`
+	Stock                 uint32   `json:"stock"`
+	Price                 float64  `json:"price"`
+	VariationSKU          string   `json:"variation_sku"`
+	Status                string   `json:"status"`
+	CreateTime            uint32   `json:"create_time"`
+	UpdateTime            uint32   `json:"update_time"`
+	OriginalPrice         float64  `json:"original_price"`
+	InflatedOriginalPrice float64  `json:"inflated_original_price"`
+	InflatedPrice         float64  `json:"inflated_price"`
+	DiscountID            uint32   `json:"discount_id"`
+	ModifiedTime          uint32   `json:"modified_time"`
+	ItemID                uint64   `json:"item_id"`
+	TierIndex             []uint32 `json:"tier_index,omitempty"`
 }
 
 type VariationService interface {

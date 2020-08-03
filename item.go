@@ -15,7 +15,7 @@ type ItemService interface {
 	AddTierVariation(sid, itemid uint64, variations []TierVariationOperDef) ([]Variation, error)
 	GetVariations(sid, itemid uint64) ([]TierVariation, []Variation, error)
 	UpdateTierVariationList(sid, itemid uint64, tierVariations []TierVariation) error
-	UpdateTierVariationIndex(sid, itemid uint64, variations []Variation) error
+	UpdateTierVariationIndex(sid, itemid uint64, variations []TierVariationIndexOperDef) error
 }
 
 // Item from https://open.shopee.com/documents?module=2&type=1&id=374

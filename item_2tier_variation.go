@@ -15,6 +15,11 @@ type TierVariationOperDef struct {
 	TierIndex    []uint32 `json:"tier_index"`
 }
 
+type TierVariationIndexOperDef struct {
+	TierIndex []uint32 `json:"tier_index"`
+	ID        uint64   `json:"variation_id"`
+}
+
 type TierVariationOperResponse struct {
 	RequestID       string          `json:"request_id"`
 	ItemID          uint32          `json:"item_id"`
@@ -70,7 +75,7 @@ func (s *ItemServiceOp) UpdateTierVariationList(sid, itemid uint64, tierVariatio
 	return err
 }
 
-func (s *ItemServiceOp) UpdateTierVariationIndex(sid, itemid uint64, variations []Variation) error {
+func (s *ItemServiceOp) UpdateTierVariationIndex(sid, itemid uint64, variations []TierVariationIndexOperDef) error {
 	path := "/item/tier_var/update"
 	wrappedData := map[string]interface{}{
 		"item_id":   itemid,

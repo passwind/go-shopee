@@ -45,7 +45,7 @@ func (s *LogisticServiceOp) List(sid uint64) ([]Logistic, error) {
 }
 
 // Init https://open.shopee.com/documents?module=3&type=1&id=389
-func (s *LogisticServiceOp) Init(sid uint64, ordersn string, params map[string]interface{}) error {
+func (s *LogisticServiceOp) Init(sid uint64, ordersn string, params map[string]interface{}) (string, error) {
 	path := "/logistics/init"
 	wrappedData := map[string]interface{}{
 		"ordersn": ordersn,
@@ -56,7 +56,7 @@ func (s *LogisticServiceOp) Init(sid uint64, ordersn string, params map[string]i
 	}
 	resource := new(LogisticInitResponse)
 	err := s.client.Post(path, wrappedData, resource)
-	return err
+	return resource.TrackingNumber, err
 }
 
 type GetParameterForInitResponse struct {

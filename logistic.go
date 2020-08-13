@@ -11,7 +11,7 @@ type Logistic struct {
 }
 
 type LogisticService interface {
-	Init(uint64, string, map[string]interface{}) error
+	Init(uint64, string, map[string]interface{}) (string, error)
 	GetParameterForInit(sid uint64, ordersn string) (*GetParameterForInitResponse, error)
 	GetLogisticInfo(sid uint64, ordersn string) (*GetLogisticInfoResponse, error)
 	List(uint64) ([]Logistic, error)

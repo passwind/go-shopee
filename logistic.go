@@ -86,17 +86,11 @@ type GetLogisticInfoResponseDropoff struct {
 	BranchList []Branch `json:"branch_list"`
 }
 
-type GetLogisticInfoResponseInfoNeeded struct {
-	Pickup        []string `json:"pickup"`
-	Dropoff       []string `json:"dropoff"`
-	NonIntegrated []string `json:"non_integrated"`
-}
-
 type GetLogisticInfoResponse struct {
-	Pickup     GetLogisticInfoResponsePickup     `json:"pickup"`
-	Dropoff    GetLogisticInfoResponseDropoff    `json:"dropoff"`
-	InfoNeeded GetLogisticInfoResponseInfoNeeded `json:"info_needed"`
-	RequestID  string                            `json:"request_id"`
+	Pickup     GetLogisticInfoResponsePickup  `json:"pickup"`
+	Dropoff    GetLogisticInfoResponseDropoff `json:"dropoff"`
+	InfoNeeded map[string][]string            `json:"info_needed"`
+	RequestID  string                         `json:"request_id"`
 }
 
 // GetLogisticInfo https://open.shopee.com/documents?module=3&type=1&id=417

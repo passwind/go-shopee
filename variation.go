@@ -4,6 +4,7 @@ type Variation struct {
 	ID                    uint64   `json:"variation_id"`
 	Name                  string   `json:"name"`
 	Stock                 uint32   `json:"stock"`
+	ReservedStock         uint32   `json:"reserved_stock"`
 	Price                 float64  `json:"price"`
 	VariationSKU          string   `json:"variation_sku"`
 	Status                string   `json:"status"`

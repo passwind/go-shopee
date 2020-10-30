@@ -47,7 +47,7 @@ type Item struct {
 	Likes                 uint32      `json:"likes"`
 	PackageLength         float64     `json:"package_length"`
 	PackageWidth          float64     `json:"package_width"`
-	PackageHight          float64     `json:"package_height"`
+	PackageHeight         float64     `json:"package_height"`
 	DaysToShip            uint32      `json:"days_to_ship"`
 	SizeChart             string      `json:"size_chart"`
 	Condition             string      `json:"condition"`

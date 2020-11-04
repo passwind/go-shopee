@@ -190,6 +190,9 @@ func (s *ItemServiceOp) Create(newItem Item) (*ItemOper, error) {
 	wrappedData, err := ToMapData(newItem)
 	resource := new(ItemOperResponse)
 	err = s.client.Post(path, wrappedData, resource)
+	if resource == nil {
+		return nil, err
+	}
 	return resource.Item, err
 }
 
@@ -199,6 +202,9 @@ func (s *ItemServiceOp) Update(updItem Item) (*ItemOper, error) {
 	wrappedData, err := ToMapData(updItem)
 	resource := new(ItemOperResponse)
 	err = s.client.Post(path, wrappedData, resource)
+	if resource == nil {
+		return nil, err
+	}
 	return resource.Item, err
 }
 

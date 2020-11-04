@@ -19,14 +19,13 @@ type ItemService interface {
 }
 
 // Item from https://open.shopee.com/documents?module=2&type=1&id=374
-type Item struct {
+type ItemBase struct {
 	ItemID                uint64      `json:"item_id"`
 	ShopID                uint64      `json:"shopid"`
 	ItemSKU               string      `json:"item_sku"`
 	Status                string      `json:"status"`
 	Name                  string      `json:"name"`
 	Description           string      `json:"description"`
-	Images                []string    `json:"images"`
 	Currency              string      `json:"currency"`
 	HasVariation          bool        `json:"has_variation"`
 	Price                 float64     `json:"price"`
@@ -60,6 +59,23 @@ type Item struct {
 	InflatedOriginalPrice float64     `json:"inflated_original_price"`
 	SipItemPrice          float64     `json:"sip_item_price"`
 	PriceSource           string      `json:"price_source"`
+}
+
+type Item struct {
+	ItemBase
+
+	Images []string `json:"images"`
+}
+
+// ItemOper from https://open.shopee.com/documents?module=2&type=1&id=365
+type ItemOper struct {
+	ItemBase
+
+	Images []Image `json:"images"`
+}
+
+type Image struct {
+	URL string `json:"url"`
 }
 
 type Wholesale struct {
@@ -141,51 +157,16 @@ func (s *ItemServiceOp) Get(sid, itemid uint64) (*Item, error) {
 	return resource.Item, err
 }
 
-type ItemOper struct {
-	ID            uint64           `json:"item_id"`
-	ShopID        uint64           `json:"shop_id"`
-	ItemSKU       string           `json:"item_sku"`
-	Status        string           `json:"status"`
-	Name          string           `json:"name"`
-	Description   string           `json:"description"`
-	Images        []string         `json:"images"`
-	Currency      string           `json:"currency"`
-	HasVariation  bool             `json:"has_variation"`
-	Price         float64          `json:"price"`
-	Stock         uint32           `json:"stock"`
-	CreateTime    uint32           `json:"create_time"`
-	UpdateTime    uint32           `json:"update_time"`
-	Weight        float64          `json:"weight"`
-	CategoryID    uint64           `json:"category_id"`
-	OriginalPrice float64          `json:"original_price"`
-	Variations    []Variation      `json:"variations"`
-	Attributes    []AttributeAdded `json:"attributes"`
-	Logistics     []Logistic       `json:"logistics"`
-	Wholesales    []Wholesale      `json:"wholesales"`
-	Sales         uint32           `json:"sales"`
-	Views         uint32           `json:"views"`
-	Likes         uint32           `json:"likes"`
-	PackageLength float64          `json:"package_length"`
-	PackageWidth  float64          `json:"package_width"`
-	PackageHight  float64          `json:"package_height"`
-	DaysToShip    uint32           `json:"days_to_ship"`
-	RatingStar    float64          `json:"rating_star"`
-	CmtCount      uint32           `json:"cmt_count"`
-	Condition     string           `json:"condition"`
-	DiscountID    uint32           `json:"discount_id"`
-	IsPreOrder    bool             `json:"is_pre_order"`
-}
-
 type ItemOperResponse struct {
-	ItemID    uint64    `json:"item_id"`
-	Item      *ItemOper `json:"item"`
-	SizeChart string    `json:"size_chart,omitempty"`
-	Warning   string    `json:"warning"`
-	FailImage []string  `json:"fail_image,omitempty"`
+	ItemID    uint64   `json:"item_id"`
+	Item      *Item    `json:"item"`
+	SizeChart string   `json:"size_chart,omitempty"`
+	Warning   string   `json:"warning"`
+	FailImage []string `json:"fail_image,omitempty"`
 }
 
 // Create https://open.shopee.com/documents?module=2&type=1&id=365
-func (s *ItemServiceOp) Create(newItem Item) (*ItemOper, error) {
+func (s *ItemServiceOp) Create(newItem ItemOper) (*Item, error) {
 	path := "/item/add"
 	wrappedData, err := ToMapData(newItem)
 	resource := new(ItemOperResponse)
@@ -197,7 +178,7 @@ func (s *ItemServiceOp) Create(newItem Item) (*ItemOper, error) {
 }
 
 // Update https://open.shopee.com/documents?module=2&type=1&id=376
-func (s *ItemServiceOp) Update(updItem Item) (*ItemOper, error) {
+func (s *ItemServiceOp) Update(updItem ItemOper) (*Item, error) {
 	path := "/item/update"
 	wrappedData, err := ToMapData(updItem)
 	resource := new(ItemOperResponse)

@@ -349,26 +349,17 @@ func wrapSpecificError(r *http.Response, err ResponseError) error {
 }
 
 func CheckResponseError(r *http.Response) error {
-	// if http.StatusOK <= r.StatusCode && r.StatusCode < http.StatusMultipleChoices {
-	// 	return nil
-	// }
-
-	// Create an anonoymous struct to parse the JSON data into.
-	shopeeError := struct {
-		RequestID string `json:"request_id"`
-		Msg       string `json:"msg,omitempty"`
-		Warning   string `json:"warning,omitempty"`
-		Error     string `json:"error,omitempty"`
-	}{}
-
 	bodyBytes, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		return err
 	}
 
-	// empty body, this probably means shopify returned an error with no body
+	// shopee returned an error with 200 body
 	// we'll handle that error in wrapSpecificError()
+	// 200 %!d(string=200 OK)
+	// {"msg": "package_width should bigger than 1", "request_id": "2894fe4fc158a114ea4bfbbd391820c4", "error": "error_param"}
 	if len(bodyBytes) > 0 {
+		var shopeeError map[string]string
 		err := json.Unmarshal(bodyBytes, &shopeeError)
 		if err != nil {
 			return ResponseDecodingError{
@@ -377,15 +368,25 @@ func CheckResponseError(r *http.Response) error {
 				Status:  r.StatusCode,
 			}
 		}
+
+		if _, ok := shopeeError["error"]; !ok && http.StatusOK <= r.StatusCode && r.StatusCode < http.StatusMultipleChoices {
+			return nil
+		}
+
+		// Create the response error from the Shopify error.
+		responseError := ResponseError{
+			Status:  r.StatusCode,
+			Message: shopeeError["error"] + ". " + shopeeError["msg"],
+		}
+
+		return wrapSpecificError(r, responseError)
 	}
 
-	// Create the response error from the Shopify error.
-	responseError := ResponseError{
-		Status:  r.StatusCode,
-		Message: shopeeError.Error,
+	if http.StatusOK <= r.StatusCode && r.StatusCode < http.StatusMultipleChoices {
+		return nil
 	}
 
-	return wrapSpecificError(r, responseError)
+	return nil
 }
 
 // CreateAndDo performs a web request to Shopify with the given method (GET,

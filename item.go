@@ -74,10 +74,6 @@ type ItemOper struct {
 	Images []Image `json:"images"`
 }
 
-type Image struct {
-	URL string `json:"url"`
-}
-
 type Wholesale struct {
 	Min       uint32  `json:"min"`
 	Max       uint32  `json:"max"`

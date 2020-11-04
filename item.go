@@ -5,8 +5,8 @@ type ItemService interface {
 	ListWithPagination(sid uint64, offset, limit uint32, options interface{}) ([]Item, *Pagination, error)
 	Count(interface{}) (int, error)
 	Get(uint64, uint64) (*Item, error)
-	Create(newItem Item) (*ItemOper, error)
-	Update(Item) (*ItemOper, error)
+	Create(newItem ItemOper) (*Item, error)
+	Update(ItemOper) (*Item, error)
 	UpdatePrice(sid, itemid uint64, price float64) (*ItemPriceOper, error)
 	UpdateStock(sid, itemid uint64, stock uint32) (*ItemStockOper, error)
 	Delete(sid, itemid uint64) error

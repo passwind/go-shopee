@@ -35,7 +35,7 @@ type ItemBase struct {
 	Weight                float64     `json:"weight"`
 	CategoryID            uint64      `json:"category_id"`
 	OriginalPrice         float64     `json:"original_price"`
-	Variations            []Variation `json:"variations"`
+	Variations            []Variation `json:"variations,omitempty"`
 	Attributes            []Attribute `json:"attributes"`
 	Logistics             []Logistic  `json:"logistics"`
 	Wholesales            []Wholesale `json:"wholesales,omitempty"`

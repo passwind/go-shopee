@@ -349,9 +349,9 @@ func wrapSpecificError(r *http.Response, err ResponseError) error {
 }
 
 func CheckResponseError(r *http.Response) error {
-	if http.StatusOK <= r.StatusCode && r.StatusCode < http.StatusMultipleChoices {
-		return nil
-	}
+	// if http.StatusOK <= r.StatusCode && r.StatusCode < http.StatusMultipleChoices {
+	// 	return nil
+	// }
 
 	// Create an anonoymous struct to parse the JSON data into.
 	shopeeError := struct {

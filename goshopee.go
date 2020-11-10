@@ -31,11 +31,11 @@ const (
 // App represents basic app settings such as Api key, secret, scope, and redirect url.
 // See oauth.go for OAuth related helper functions.
 type App struct {
-	PartnerID   int    // `env:"SHOPEE_PARTNER_ID" envDefault:"845053"`
-	PartnerKey  string // `env:"SHOPEE_PARTNER_KEY" envDefault:"c6d9a539b1db480d490bc9e9e71eff7e37babc8298190db7355c50cf69f9d0c3"`
-	AuthURL     string // `env:"SHOPEE_AUTH_URL" envDefault:"https://partner.shopeemobile.com/api/v1/shop/auth_partner"`
-	RedirectURL string // `env:"SHOPEE_REDIRECT_URL" envDefault:"https://wd.wizardcloud.cn"`
-	APIURL      string // `env:"SHOPEE_API_URL" envDefault:"https://partner.shopeemobile.com"`
+	PartnerID   int    // `env:"SHOPEE_PARTNER_ID"`
+	PartnerKey  string // `env:"SHOPEE_PARTNER_KEY"`
+	AuthURL     string // `env:"SHOPEE_AUTH_URL"`
+	RedirectURL string // `env:"SHOPEE_REDIRECT_URL"`
+	APIURL      string // `env:"SHOPEE_API_URL"`
 	Client      *Client
 }
 

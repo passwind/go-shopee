@@ -9,10 +9,9 @@ type TierVariation struct {
 }
 
 type TierVariationOperDef struct {
-	Stock        uint32   `json:"stock"`
-	Price        float64  `json:"price"`
-	VariationSKU string   `json:"variation_sku"`
-	TierIndex    []uint32 `json:"tier_index"`
+	Stock     uint32   `json:"stock"`
+	Price     float64  `json:"price"`
+	TierIndex []uint32 `json:"tier_index"`
 }
 
 type TierVariationIndexOperDef struct {

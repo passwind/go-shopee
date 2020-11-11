@@ -295,14 +295,49 @@ func (c *Client) doGetHeaders(req *http.Request, v interface{}) (http.Header, er
 	defer resp.Body.Close()
 
 	if v != nil {
-		decoder := json.NewDecoder(resp.Body)
-		err := decoder.Decode(&v)
+		content, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
+			return nil, fmt.Errorf("fetch response body error: %s", err)
+		}
+		if err := c.checkShopeeError(resp, content); err != nil {
 			return nil, err
+		}
+		if err := json.Unmarshal(content, &v); err != nil {
+			return nil, fmt.Errorf("decode resp error: %s", err)
 		}
 	}
 
 	return resp.Header, nil
+}
+
+// checkShopeeError shopee returned an error with 200 body
+// we'll handle that error in wrapSpecificError()
+// 200 %!d(string=200 OK)
+// {"msg": "package_width should bigger than 1", "request_id": "2894fe4fc158a114ea4bfbbd391820c4", "error": "error_param"}
+func (c *Client) checkShopeeError(r *http.Response, bodyBytes []byte) error {
+	if len(bodyBytes) > 0 {
+		bodyStr := string(bodyBytes)
+		if strings.Index(bodyStr, "error") > 0 {
+			var shopeeError Error
+			err := json.Unmarshal(bodyBytes, &shopeeError)
+			if err != nil {
+				return ResponseDecodingError{
+					Body:    bodyBytes,
+					Message: fmt.Sprintf("decode error msg: %s", err.Error()),
+					Status:  r.StatusCode,
+				}
+			}
+			// Create the response error from the shopee error.
+			responseError := ResponseError{
+				Status:  r.StatusCode,
+				Message: shopeeError.Error + "[" + shopeeError.Message + "]",
+			}
+
+			return wrapSpecificError(r, responseError)
+		}
+	}
+
+	return nil
 }
 
 func (c *Client) logRequest(req *http.Request) {
@@ -349,44 +384,16 @@ func wrapSpecificError(r *http.Response, err ResponseError) error {
 }
 
 func CheckResponseError(r *http.Response) error {
-	bodyBytes, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		return err
-	}
-
-	// shopee returned an error with 200 body
-	// we'll handle that error in wrapSpecificError()
-	// 200 %!d(string=200 OK)
-	// {"msg": "package_width should bigger than 1", "request_id": "2894fe4fc158a114ea4bfbbd391820c4", "error": "error_param"}
-	if len(bodyBytes) > 0 {
-		var shopeeError map[string]string
-		err := json.Unmarshal(bodyBytes, &shopeeError)
-		if err != nil {
-			return ResponseDecodingError{
-				Body:    bodyBytes,
-				Message: err.Error(),
-				Status:  r.StatusCode,
-			}
-		}
-
-		if _, ok := shopeeError["error"]; !ok && http.StatusOK <= r.StatusCode && r.StatusCode < http.StatusMultipleChoices {
-			return nil
-		}
-
-		// Create the response error from the Shopify error.
-		responseError := ResponseError{
-			Status:  r.StatusCode,
-			Message: shopeeError["error"] + ". " + shopeeError["msg"],
-		}
-
-		return wrapSpecificError(r, responseError)
-	}
-
 	if http.StatusOK <= r.StatusCode && r.StatusCode < http.StatusMultipleChoices {
 		return nil
 	}
 
-	return nil
+	responseError := ResponseError{
+		Status:  r.StatusCode,
+		Message: r.Status,
+	}
+
+	return wrapSpecificError(r, responseError)
 }
 
 // CreateAndDo performs a web request to Shopify with the given method (GET,

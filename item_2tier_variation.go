@@ -21,7 +21,7 @@ type TierVariationIndexOperDef struct {
 
 type TierVariationOperResponse struct {
 	RequestID       string          `json:"request_id"`
-	ItemID          uint32          `json:"item_id"`
+	ItemID          uint64          `json:"item_id"` // help doc is uint32, in fact is uint64
 	TierVariation   []TierVariation `json:"tier_variation,omitempty"`
 	VariationIDList []Variation     `json:"variation_id_list"`
 }

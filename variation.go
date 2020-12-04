@@ -67,7 +67,7 @@ type UpdateVariationPriceRequest struct {
 	ItemID      uint64  `json:"item_id"`
 	VariationID uint64  `json:"variation_id"`
 	Price       float64 `json:"price"`
-	ShopID      uint64  `json:"shop_id"`
+	ShopID      uint64  `json:"shopid"`
 }
 
 type UpdateVariationPriceResponse struct {
@@ -94,7 +94,7 @@ type UpdateVariationStockRequest struct {
 	ItemID      uint64 `json:"item_id"`
 	VariationID uint64 `json:"variation_id"`
 	Stock       uint32 `json:"stock"`
-	ShopID      uint64 `json:"shop_id"`
+	ShopID      uint64 `json:"shopid"`
 }
 
 type UpdateVariationStockResponse struct {

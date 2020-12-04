@@ -6,7 +6,7 @@ type ItemService interface {
 	Count(interface{}) (int, error)
 	Get(uint64, uint64) (*Item, error)
 	Create(newItem ItemOper) (*Item, error)
-	Update(ItemOper) (*Item, error)
+	Update(ItemBase) (*Item, error)
 	UpdatePrice(sid, itemid uint64, price float64) (*ItemPriceOper, error)
 	UpdateStock(sid, itemid uint64, stock uint32) (*ItemStockOper, error)
 	Delete(sid, itemid uint64) error
@@ -174,7 +174,7 @@ func (s *ItemServiceOp) Create(newItem ItemOper) (*Item, error) {
 }
 
 // Update https://open.shopee.com/documents?module=2&type=1&id=376
-func (s *ItemServiceOp) Update(updItem ItemOper) (*Item, error) {
+func (s *ItemServiceOp) Update(updItem ItemBase) (*Item, error) {
 	path := "/item/update"
 	wrappedData, err := ToMapData(updItem)
 	resource := new(ItemOperResponse)

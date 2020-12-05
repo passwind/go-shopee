@@ -21,6 +21,7 @@ type Variation struct {
 
 type VariationService interface {
 	Create(uint64, uint64, Variation) (*Variation, error)
+	Delete(uint64, uint64, uint64) error
 	UpdateVariationPrice(uint64, uint64, Variation) (*Variation, error)
 	UpdateVariationStock(uint64, uint64, Variation) (*Variation, error)
 }
@@ -61,6 +62,33 @@ func (s *VariationServiceOp) Create(sid, itemID uint64, newItem Variation) (*Var
 		return nil, err
 	}
 	return &resource.Variations[0], err
+}
+
+type DeleteVariationRequest struct {
+	ItemID      uint64 `json:"item_id"`
+	VariationID uint64 `json:"variation_id"`
+	ShopID      uint64 `json:"shopid"`
+}
+
+type DeleteVariationResponse struct {
+	ItemID       uint64 `json:"item_id"`
+	VariationID  uint64 `json:"variation_id"`
+	ModifiedTime uint32 `json:"modified_time"`
+	RequestID    string `json:"request_id"`
+}
+
+// Delete https://open.shopee.com/documents?module=2&type=1&id=371
+func (s *VariationServiceOp) Delete(sid, itemID, variationID uint64) error {
+	path := "/item/delete_variation"
+	req := DeleteVariationRequest{
+		ItemID:      itemID,
+		VariationID: variationID,
+		ShopID:      sid,
+	}
+	wrappedData, err := ToMapData(req)
+	resource := new(DeleteVariationResponse)
+	err = s.client.Post(path, wrappedData, resource)
+	return err
 }
 
 type UpdateVariationPriceRequest struct {

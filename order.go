@@ -135,27 +135,37 @@ func (s *OrderServiceOp) List(sid uint64) ([]Order, error) {
 // ListWithPagination https://open.shopee.com/documents?module=4&type=1&id=399
 func (s *OrderServiceOp) ListWithPagination(sid uint64, offset, limit uint32, options map[string]interface{}) ([]Order, *Pagination, error) {
 	path := "/orders/basics"
-	timeTo := time.Now().Unix()
-	timeFrom := timeTo - 3600*24*15
-
-	if options != nil {
-		if v, ok := options["create_time_from"]; ok {
-			timeFrom = v.(int64)
-		}
-		if v, ok := options["create_time_to"]; ok {
-			timeTo = v.(int64)
-		}
-	}
 
 	wrappedData := map[string]interface{}{
 		"pagination_offset": offset,
 		"shopid":            sid,
-		"create_time_from":  timeFrom,
-		"create_time_to":    timeTo,
 	}
 
 	if limit > 0 {
 		wrappedData["pagination_entries_per_page"] = limit
+	}
+
+	for opt, v := range options {
+		wrappedData[opt] = v
+	}
+
+	timeTo := time.Now().Unix()
+	timeFrom := timeTo - 3600*24*15
+
+	if v, ok := wrappedData["create_time_from"]; !ok {
+		wrappedData["create_time_from"] = timeFrom
+	} else {
+		tt := v.(uint32)
+		timeFrom = int64(tt)
+	}
+
+	if _, ok := options["create_time_to"]; !ok {
+		wrappedData["create_time_to"] = timeFrom + 3600*24*15
+	}
+
+	if v, ok := options["order_status"]; ok {
+		path = "/orders/get"
+		wrappedData["order_status"] = v
 	}
 
 	resource := new(OrdersResponse)

@@ -12,7 +12,7 @@ type Logistic struct {
 
 type LogisticService interface {
 	Init(uint64, string, map[string]interface{}) (string, error)
-	GetParameterForInit(sid uint64, ordersn string) (*GetParameterForInitResponse, error)
+	GetParameterForInit(sid uint64, ordersn string) (*map[string]interface{}, error)
 	GetLogisticInfo(sid uint64, ordersn string) (*GetLogisticInfoResponse, error)
 	List(uint64) ([]Logistic, error)
 }
@@ -59,21 +59,21 @@ func (s *LogisticServiceOp) Init(sid uint64, ordersn string, params map[string]i
 	return resource.TrackingNumber, err
 }
 
-type GetParameterForInitResponse struct {
-	Pickup        []string `json:"pickup"`
-	Dropoff       []string `json:"dropoff"`
-	NonIntegrated []string `json:"non_integrated"`
-	RequestID     string   `json:"request_id"`
-}
+// type GetParameterForInitResponse struct {
+// 	Pickup        []string `json:"pickup"`
+// 	Dropoff       []string `json:"dropoff"`
+// 	NonIntegrated []string `json:"non_integrated"`
+// 	RequestID     string   `json:"request_id"`
+// }
 
 // GetParameterForInit https://open.shopee.com/documents?module=3&type=1&id=386
-func (s *LogisticServiceOp) GetParameterForInit(sid uint64, ordersn string) (*GetParameterForInitResponse, error) {
+func (s *LogisticServiceOp) GetParameterForInit(sid uint64, ordersn string) (*map[string]interface{}, error) {
 	path := "/logistics/init_parameter/get"
 	wrappedData := map[string]interface{}{
 		"ordersn": ordersn,
 		"shopid":  sid,
 	}
-	resource := new(GetParameterForInitResponse)
+	resource := new(map[string]interface{})
 	err := s.client.Post(path, wrappedData, resource)
 	return resource, err
 }

@@ -48,10 +48,10 @@ type Order struct {
 	DropShipperPhone             string            `json:"dropshipper_phone"`
 	ShipByDate                   int64             `json:"ship_by_date"`
 	IsSplitUp                    bool              `json:"is_split_up"`
-	BuyerCancelReason            string            `json:"buyer_cancel_reason"`
+	BuyerCancelReason            interface{}            `json:"buyer_cancel_reason"` // Cancel order is number, eg. 0, other is string
 	CancelBy                     string            `json:"cancel_by"`
 	FmTN                         string            `json:"fm_tn"` // The first-mile tracking number.
-	CancelReason                 string            `json:"cancel_reason"`
+	CancelReason                 interface{}            `json:"cancel_reason"` // Cancel order is number, eg. 0, other is string
 	EscrowTax                    string            `json:"escrow_tax"`
 	IsActualShippingFeeConfirmed bool              `json:"is_actual_shipping_fee_confirmed"`
 }

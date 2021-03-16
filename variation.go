@@ -19,11 +19,42 @@ type Variation struct {
 	TierIndex             []uint32 `json:"tier_index,omitempty"`
 }
 
+type VariationPriceRequest struct {
+	ItemID                uint64   `json:"item_id"`
+	VariationID                    uint64   `json:"variation_id"`
+	Price                 float64  `json:"price"`
+	ItemPrice float64 `json:"item_price"`
+}
+
+type VariationPriceResponse struct {
+	RequestID string `json:"request_id"`
+	Results []VariationPriceResponseBatchResult `json:"batch_result"`
+}
+
+type VariationPriceResponseBatchResult struct {
+	Modifications []VariationPriceResponseBatchResultModification `json:"modifications"`
+	Failures []VariationPriceResponseBatchResultFailure `json:"failures"`
+}
+
+type VariationPriceResponseBatchResultModification struct {
+	ItemID                uint64   `json:"item_id"`
+	VariationID                    uint64   `json:"variation_id"`
+	ItemPrice float64 `json:"item_price"`
+}
+
+type VariationPriceResponseBatchResultFailure struct {
+	ItemID                uint64   `json:"item_id"`
+	VariationID                    uint64   `json:"variation_id"`
+	ErrorDiscription string `json:"error_description"`
+
+}
+
 type VariationService interface {
 	Create(uint64, uint64, Variation) (*Variation, error)
 	Delete(uint64, uint64, uint64) error
 	UpdateVariationPrice(uint64, uint64, Variation) (*Variation, error)
 	UpdateVariationStock(uint64, uint64, Variation) (*Variation, error)
+	UpdateVariationPriceBatch(uint64, []VariationPriceRequest) (*VariationPriceResponse, error)
 }
 
 // VariationServiceOp handles communication with the product related methods of
@@ -143,4 +174,19 @@ func (s *VariationServiceOp) UpdateVariationStock(sid, itemID uint64, updItem Va
 	resource := new(UpdateVariationStockResponse)
 	err = s.client.Post(path, wrappedData, resource)
 	return &resource.Variation, err
+}
+
+func (s *VariationServiceOp) UpdateVariationPriceBatch(sid uint64, params []VariationPriceRequest) (*VariationPriceResponse, error) {
+	path := "/items/update/vars_price"
+	req := map[string]interface{}{
+		"shopid":      sid,
+		"variations": params,
+	}
+	wrappedData, err := ToMapData(req)
+	if err!=nil {
+		return nil, err
+	}
+	resource := new(VariationPriceResponse)
+	err = s.client.Post(path, wrappedData, resource)
+	return resource, err
 }

@@ -75,6 +75,7 @@ type Client struct {
 	ItemAttribute ItemAttributeService
 	Order         OrderService
 	Logistic      LogisticService
+	Discount DiscountService
 }
 
 // A general response error that follows a similar layout to Shopify's response
@@ -228,6 +229,7 @@ func NewClient(app App, opts ...Option) *Client {
 	c.ItemAttribute = &ItemAttributeServiceOp{client: c}
 	c.Logistic = &LogisticServiceOp{client: c}
 	c.Shop = &ShopServiceOp{client: c}
+	c.Discount = &DiscountServiceOp{client: c}
 
 	// apply any options
 	for _, opt := range opts {

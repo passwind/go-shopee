@@ -316,11 +316,13 @@ func (c *Client) doGetHeaders(req *http.Request, v interface{}) (http.Header, er
 // we'll handle that error in wrapSpecificError()
 // 200 %!d(string=200 OK)
 // {"msg": "package_width should bigger than 1", "request_id": "2894fe4fc158a114ea4bfbbd391820c4", "error": "error_param"}
-// TODO: but some response includes "errors" (eg. /orders/detail) , maybe it isn't error
+// {"batch_result": {"failures": [{"item_id": 100926704, "error_description": "mst shop not found", "variation_id": 5249278}, {"item_id": 100926704, "error_description": "mst shop not found", "variation_id": 5249278}, {"item_id": 100926704, "error_description": "mst shop not found", "variation_id": 5249278}, {"item_id": 100926704, "error_description": "mst shop not found", "variation_id": 5249278}], "modifications": []}, "request_id": "6e0276c51cf3944d0ce518643c9ba149"}
 func (c *Client) checkShopeeError(r *http.Response, bodyBytes []byte) error {
 	if len(bodyBytes) > 0 {
 		bodyStr := string(bodyBytes)
-		if strings.Index(bodyStr, "error") > 0 && strings.Index(bodyStr, "errors") == -1 {
+		if strings.Index(bodyStr, "error") > 0 && 
+			!strings.Contains(bodyStr, "errors") && 
+			!strings.Contains(bodyStr, "error_description") {
 			var shopeeError Error
 			err := json.Unmarshal(bodyBytes, &shopeeError)
 			if err != nil {

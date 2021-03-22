@@ -19,16 +19,16 @@ type DiscountResponse struct {
 }
 
 type DiscountResponseError struct {
-	ItemID uint32 `json:"item_id"`
-	VariationID uint32 `json:"variation_id"`
+	ItemID uint64 `json:"item_id"`
+	VariationID uint64 `json:"variation_id"`
 	ErrorMsg string `json:"error_msg"`
 }
 
 type DiscountActionResponse struct {
 	DiscountID uint64 `json:"discount_id"`
 	RequestID string `json:"request_id"`
-	ItemID uint32 `json:"item_id"`
-	VariationID uint32 `json:"variation_id"`
+	ItemID uint64 `json:"item_id"`
+	VariationID uint64 `json:"variation_id"`
 	ModifyTime int64 `json:"modify_time"`
 }
 
@@ -109,7 +109,7 @@ func (s *DiscountServiceOp) AddDiscountItem(sid, discountID uint64, req map[stri
 }
 
 func (s *DiscountServiceOp) DeleteDiscountItem(sid, discountID, itemID, variationID uint64) (*DiscountActionResponse,error) {
-	path := "/discount/delete"
+	path := "/discount/item/delete"
 	wrappedData := map[string]interface{}{
 		"shopid":  sid,
 		"discount_id": discountID,
@@ -140,7 +140,7 @@ func (s *DiscountServiceOp) UpdateDiscount(sid,discountID uint64, req map[string
 }
 
 func (s *DiscountServiceOp) UpdateDiscountItems(sid, discountID uint64, req map[string]interface{}) (*DiscountResponse,error) {
-	path := "discount/update"
+	path := "discount/items/update"
 	wrappedData := map[string]interface{}{
 		"shopid":  sid,
 		"discount_id": discountID,

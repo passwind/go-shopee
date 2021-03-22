@@ -50,7 +50,7 @@ type ItemBase struct {
 	DaysToShip            uint32      `json:"days_to_ship"`
 	SizeChart             string      `json:"size_chart"`
 	Condition             string      `json:"condition"`
-	DiscountID            uint32      `json:"discount_id"`
+	DiscountID            uint64      `json:"discount_id"`
 	Is2tierItem           bool        `json:"is_2tier_item"`
 	Tenures               []uint32    `json:"tenures"`
 	ReservedStock         uint32      `json:"reserved_stock"`
@@ -81,7 +81,7 @@ type Wholesale struct {
 }
 
 type ItemResponse struct {
-	ItemID    uint32 `json:"item_id"`
+	ItemID    uint64 `json:"item_id"`
 	RequestID string `json:"request_id"`
 }
 
@@ -253,12 +253,12 @@ func (s *ItemServiceOp) UpdateStock(sid, itemid uint64, stock uint32) (*ItemStoc
 }
 
 type UnlistItemFailed struct {
-	ItemID           uint32 `json:"item_id"`
+	ItemID           uint64 `json:"item_id"`
 	ErrorDescription string `json:"error_description"`
 }
 
 type UnlistItemSuccess struct {
-	ItemID uint32 `json:"item_id"`
+	ItemID uint64 `json:"item_id"`
 	Unlist bool   `json:"unlist"`
 }
 
@@ -272,9 +272,11 @@ type UnlistResponse struct {
 func (s *ItemServiceOp) UnlistItem(sid, itemid uint64, unlist bool) ([]UnlistItemSuccess, []UnlistItemFailed, error) {
 	path := "/items/unlist"
 	wrappedData := map[string]interface{}{
-		"items": map[string]interface{}{
-			"item_id": itemid,
-			"unlist":  unlist,
+		"items": []map[string]interface{}{
+			map[string]interface{}{
+				"item_id": itemid,
+				"unlist":  unlist,
+			},
 		},
 		"shopid": sid,
 	}

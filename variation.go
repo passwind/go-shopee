@@ -13,7 +13,7 @@ type Variation struct {
 	OriginalPrice         float64  `json:"original_price"`
 	InflatedOriginalPrice float64  `json:"inflated_original_price"`
 	InflatedPrice         float64  `json:"inflated_price"`
-	DiscountID            uint32   `json:"discount_id"`
+	DiscountID            uint64   `json:"discount_id"`
 	ModifiedTime          uint32   `json:"modified_time"`
 	ItemID                uint64   `json:"item_id"`
 	TierIndex             []uint32 `json:"tier_index,omitempty"`
